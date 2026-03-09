@@ -6,13 +6,13 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:45:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/07 13:47:10 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:04:26 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-static int	moniotor_check_cycle(t_sim *sim, long long now)
+static int	monitor_check_cycle(t_sim *sim, long long now)
 {
 	int	burned_id;
 

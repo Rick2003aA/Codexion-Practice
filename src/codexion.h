@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
+/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 11:04:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/08 11:45:04 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/09 12:26:35 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

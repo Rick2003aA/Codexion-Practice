@@ -1,19 +1,23 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   coder_actions.c                                    :+:      :+:    :+:   */
+/*   log.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
+/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/06 13:27:11 by shinnunohis       #+#    #+#             */
-/*   Updated: 2026/03/08 12:05:03 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/09 11:47:22 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void	coder_do_refactor(t_coder *coder)
+void	log_state(t_sim *sim, int coder_id, const char *msg)
 {
-	log_state(coder->sim, coder->coder_id, "is refactoring");
-	sleep_ms(coder->sim->rules.time_to_refactor);
+	long	timestamp;
+
+	pthread_mutex_lock(&sim->log_mutex);
+	timestamp = timestamp_ms(sim);
+	printf("%ld %d %s\n", timestamp, coder_id, msg);
+	pthread_mutex_unlock(&sim->log_mutex);
 }

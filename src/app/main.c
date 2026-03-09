@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 11:03:37 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/07 12:53:00 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:00:44 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,24 @@ static void	run_simulation(t_sim *sim, pthread_t *monitor_th)
 		pthread_create(&sim->threads[i], NULL, coder_routine, &coders[i]);
 		i++;
 	}
+}
+
+static void	cleanup_sim(t_sim *sim, pthread_t monitor_th)
+{
+	int		i;
+	t_coder	*coders;
+
+	coders = sim->coders;
+	i = 0;
+	while (i < sim->coder_count)
+		pthread_join(sim->threads[i++], NULL);
+	pthread_join(monitor_th, NULL);
+	i = 0;
+	while (i < sim->coder_count)
+		pthread_mutex_destroy(&coders[i++].action_mutex);
+	sim_destroy(sim);
+	free(sim->threads);
+	free(sim->coders);
 }
 
 int	main(int ac, char **av)

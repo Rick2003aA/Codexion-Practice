@@ -1,23 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   log.c                                              :+:      :+:    :+:   */
+/*   time.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
+/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/06 13:27:11 by shinnunohis       #+#    #+#             */
-/*   Updated: 2026/03/08 12:07:48 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/09 12:11:59 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void    log_state(t_sim *sim, int coder_id, const char *msg)
+long	timestamp_ms(t_sim *sim)
 {
-    long    timestamp;
+	return (now_ms() - sim->start_ms);
+}
 
-    pthread_mutex_lock(&sim->log_mutex);
-	timestamp = timestamp_ms(sim);
-	printf("%ld %d %s\n", timestamp, coder_id, msg);
-	pthread_mutex_unlock(&sim->log_mutex);
+long	now_ms(void) // Can't understand of this calculation logic
+{
+	struct timeval	tv;
+
+	gettimeofday(&tv, NULL);
+	return (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
+}
+
+void	coder_touch(t_coder *c)
+{
+	pthread_mutex_lock(&c->action_mutex);
+	c->last_compile_start_ms = timestamp_ms(c->sim);
+	pthread_mutex_unlock(&c->action_mutex);
 }

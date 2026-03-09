@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_routine.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
+/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 14:11:32 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/08 11:47:50 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/09 11:44:29 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,15 +29,16 @@ static void	coder_init_cycle(t_coder *coder, int *first, int *second)
 		*first = left;
 		*second = right;
 	}
-	else{
+	else
+	{
 		*first = right;
 		*second = left;
 	}
 }
 
-void    *coder_routine(void *arg)
+void	*coder_routine(void *arg)
 {
-    int		i;
+	int		i;
 	int		first;
 	int		second;
 	t_coder	*coder;
