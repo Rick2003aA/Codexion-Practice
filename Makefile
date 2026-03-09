@@ -2,23 +2,23 @@ NAME := codexion
 
 CC := cc
 CFLAGS := -Wall -Wextra -Werror -pthread
-CFLAGS += -I src
+CFLAGS += -I coders
 
-SRC := src/app/main.c \
-	src/core/sim_stop.c \
-	src/core/dongle.c \
-	src/core/heap.c \
-	src/core/scheduler.c \
-	src/core/coder_actions.c \
-	src/core/coder_routine.c \
-	src/core/monitor.c \
-	src/core/monitor_checks.c \
-	src/init/parse.c \
-	src/init/sim_init.c \
-	src/common/time.c \
-	src/common/log.c \
-	src/common/sleep.c \
-	src/common/cleanup.c
+SRC := coders/app/main.c \
+	coders/core/sim_stop.c \
+	coders/core/dongle.c \
+	coders/core/heap.c \
+	coders/core/scheduler.c \
+	coders/core/coder_actions.c \
+	coders/core/coder_routine.c \
+	coders/core/monitor.c \
+	coders/core/monitor_checks.c \
+	coders/init/parse.c \
+	coders/init/sim_init.c \
+	coders/common/time.c \
+	coders/common/log.c \
+	coders/common/sleep.c \
+	coders/common/cleanup.c
 
 OBJ := $(SRC:.c=.o)
 
@@ -34,5 +34,8 @@ fclean: clean
 	rm -f $(NAME)
 
 re: fclean all
+
+run: all
+	./$(NAME) 5 1400 200 100 100 3 0 fifo
 
 .PHONY: all clean fclean re

@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:45:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 15:04:26 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 17:31:38 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,8 +33,8 @@ static int	monitor_check_cycle(t_sim *sim, long long now)
 
 void	*monitor_routine(void *arg)
 {
-	t_sim	*sim;
-	long	now;
+	t_sim		*sim;
+	long long	now;
 
 	sim = (t_sim *)arg;
 	while (!sim_should_stop(sim))
