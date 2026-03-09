@@ -43,3 +43,52 @@ void	sim_destroy(t_sim *sim)
 	pthread_cond_destroy(&sim->sched_cv);
 	pthread_mutex_destroy(&sim->sched_mutex);
 }
+
+void	cleanup_threads_coders(t_sim *sim)
+{
+	free(sim->compile_heap);
+	sim->compile_heap = NULL;
+	free(sim->threads);
+	sim->threads = NULL;
+	free(sim->coders);
+	sim->coders = NULL;
+}
+
+void	cleanup_sim(t_sim *sim, pthread_t monitor_th)
+{
+	int		i;
+	t_coder	*coders;
+
+	coders = sim->coders;
+	i = 0;
+	while (i < sim->coder_count)
+		pthread_join(sim->threads[i++], NULL);
+	pthread_join(monitor_th, NULL);
+	i = 0;
+	while (i < sim->coder_count)
+		pthread_mutex_destroy(&coders[i++].action_mutex);
+	sim_destroy(sim);
+	free(sim->threads);
+	free(sim->coders);
+}
+
+void	cleanup_sim_after_failed_run(t_sim *sim, pthread_t monitor_th,
+		int created_workers, int monitor_created)
+{
+	int		i;
+	t_coder	*coders;
+
+	coders = sim->coders;
+	sim_request_stop(sim);
+	i = 0;
+	while (i < created_workers)
+		pthread_join(sim->threads[i++], NULL);
+	if (monitor_created)
+		pthread_join(monitor_th, NULL);
+	i = 0;
+	while (i < sim->coder_count)
+		pthread_mutex_destroy(&coders[i++].action_mutex);
+	sim_destroy(sim);
+	free(sim->threads);
+	free(sim->coders);
+}

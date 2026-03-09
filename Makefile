@@ -7,6 +7,7 @@ CFLAGS += -I src
 SRC := src/app/main.c \
 	src/core/sim_stop.c \
 	src/core/dongle.c \
+	src/core/heap.c \
 	src/core/scheduler.c \
 	src/core/coder_actions.c \
 	src/core/coder_routine.c \

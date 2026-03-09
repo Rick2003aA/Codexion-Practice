@@ -12,6 +12,18 @@
 
 #include "codexion.h"
 
+void	coder_do_debug(t_coder *coder)
+{
+	log_state(coder->sim, coder->coder_id, "is debugging");
+	sleep_ms(coder->sim->rules.time_to_debug);
+}
+
+void	coder_do_refactor(t_coder *coder)
+{
+	log_state(coder->sim, coder->coder_id, "is refactoring");
+	sleep_ms(coder->sim->rules.time_to_refactor);
+}
+
 static void	coder_init_cycle(t_coder *coder, int *first, int *second)
 {
 	int	idx;

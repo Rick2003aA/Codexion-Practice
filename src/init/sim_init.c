@@ -12,16 +12,6 @@
 
 #include "codexion.h"
 
-static void	cleanup_threads_coders(t_sim *sim)
-{
-	free(sim->compile_heap);
-	sim->compile_heap = NULL;
-	free(sim->threads);
-	sim->threads = NULL;
-	free(sim->coders);
-	sim->coders = NULL;
-}
-
 static void	cleanup_sync_objects(t_sim *sim)
 {
 	pthread_mutex_destroy(&sim->log_mutex);
@@ -46,26 +36,26 @@ static int	init_sync_objects(t_sim *sim)
 	return (0);
 }
 
+static int	init_single_dongle(t_dongle *d)
+{
+	if (pthread_mutex_init(&d->m, NULL) != 0)
+		return (1);
+	if (pthread_cond_init(&d->cv, NULL) != 0)
+		return (pthread_mutex_destroy(&d->m), 1);
+	d->availble_at_ms = 0;
+	return (0);
+}
+
 static int	init_all_dongles(t_sim *sim)
 {
 	int	i;
 
 	sim->dongles = malloc(sizeof(t_dongle) * sim->dongle_count);
-	if (!(sim->dongles))
+	if (!sim->dongles)
 		return (1);
 	i = 0;
-	while (i < sim->dongle_count)
-	{
-		if (pthread_mutex_init(&sim->dongles[i].m, NULL) != 0)
-			break ;
-		if (pthread_cond_init(&sim->dongles[i].cv, NULL) != 0)
-		{
-			pthread_mutex_destroy(&sim->dongles[i].m);
-			break ;
-		}
-		sim->dongles[i].availble_at_ms = 0;
+	while (i < sim->dongle_count && !init_single_dongle(&sim->dongles[i]))
 		i++;
-	}
 	if (i == sim->dongle_count)
 		return (0);
 	while (i > 0)

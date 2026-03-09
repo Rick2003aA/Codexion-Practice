@@ -47,24 +47,27 @@ static void	coder_finish_compile(t_coder *coder, int first, int second)
 	pthread_mutex_unlock(&coder->action_mutex);
 }
 
+static int	coder_handle_single(t_coder *coder, int first)
+{
+	if (!dongle_lock(coder->sim, first))
+	{
+		scheduler_release_turn(coder);
+		return (0);
+	}
+	log_state(coder->sim, coder->coder_id, "has taken a dongle");
+	scheduler_release_turn(coder);
+	while (!sim_should_stop(coder->sim))
+		sleep_ms(1);
+	dongle_unlock_with_cooldown(coder->sim, first);
+	return (0);
+}
+
 int	coder_do_compile(t_coder *coder, int first, int second)
 {
 	if (!scheduler_wait_turn(coder))
 		return (0);
 	if (first == second)
-	{
-		if (!dongle_lock(coder->sim, first))
-		{
-			scheduler_release_turn(coder);
-			return (0);
-		}
-		log_state(coder->sim, coder->coder_id, "has taken a dongle");
-		scheduler_release_turn(coder);
-		while (!sim_should_stop(coder->sim))
-			sleep_ms(1);
-		dongle_unlock_with_cooldown(coder->sim, first);
-		return (0);
-	}
+		return (coder_handle_single(coder, first));
 	if (!coder_take_dongles(coder, first, second))
 	{
 		scheduler_release_turn(coder);
@@ -73,16 +76,4 @@ int	coder_do_compile(t_coder *coder, int first, int second)
 	coder_finish_compile(coder, first, second);
 	scheduler_release_turn(coder);
 	return (1);
-}
-
-void	coder_do_debug(t_coder *coder)
-{
-	log_state(coder->sim, coder->coder_id, "is debugging");
-	sleep_ms(coder->sim->rules.time_to_debug);
-}
-
-void	coder_do_refactor(t_coder *coder)
-{
-	log_state(coder->sim, coder->coder_id, "is refactoring");
-	sleep_ms(coder->sim->rules.time_to_refactor);
 }

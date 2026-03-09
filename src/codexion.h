@@ -104,18 +104,28 @@ void	sim_request_stop(t_sim *sim);
 int		dongle_lock(t_sim *sim, int idx);
 void	dongle_unlock_with_cooldown(t_sim *sim, int idx);
 
+// core/heap.c
+void	heapify_up(t_sim *sim, int idx);
+void	heapify_down(t_sim *sim, int idx);
+
 // core/scheduler.c
 int		scheduler_wait_turn(t_coder *coder);
 void	scheduler_release_turn(t_coder *coder);
 
 // core/coder_actions.c
 int		coder_do_compile(t_coder *coder, int first, int second);
+
+// core/coder_routine.c
 void	coder_do_debug(t_coder *coder);
 void	coder_do_refactor(t_coder *coder);
-
-// app/main.c
-void	sim_destroy(t_sim *sim);
 void	*coder_routine(void *arg);
+
+// common/cleanup.c
+void	sim_destroy(t_sim *sim);
+void	cleanup_threads_coders(t_sim *sim);
+void	cleanup_sim(t_sim *sim, pthread_t monitor_th);
+void	cleanup_sim_after_failed_run(t_sim *sim, pthread_t monitor_th,
+		int created_workers, int monitor_created);
 
 // utils.c
 void	sleep_ms(long ms);
