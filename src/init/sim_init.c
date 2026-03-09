@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:53:14 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/07 13:37:40 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:26:40 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,6 @@ static int	init_sync_objects(t_sim *sim)
 static int	init_all_dongles(t_sim *sim)
 {
 	int	i;
-	int	try;
 
 	sim->dongles = malloc(sizeof(t_dongle) * sim->dongle_count);
 	if (!(sim->dongles))
@@ -68,6 +67,7 @@ static int	init_all_dongles(t_sim *sim)
 	{
 		pthread_cond_destroy(&sim->dongles[i - 1].cv);
 		pthread_mutex_destroy(&sim->dongles[i - 1].m);
+		i--;
 	}
 	return (free(sim->dongles), sim->dongles = NULL, 1);
 }
@@ -85,7 +85,7 @@ int	sim_init(t_sim *sim)
 	sim->fifo_serving_ticket = 0;
 	sim->fifo_next_ticket = 0;
 	sim->dongles = NULL;
-	if (init_sync_objecrts(sim))
+	if (init_sync_objects(sim))
 		return (cleanup_threads_coders(sim), 1);
 	if (init_all_dongles(sim))
 		return (cleanup_sync_objects(sim), cleanup_threads_coders(sim), 1);

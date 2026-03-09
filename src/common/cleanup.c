@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 14:36:30 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 14:53:55 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:28:07 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,7 @@ static void	destroy_dongles(t_sim *sim)
 
 	if (!sim->dongles)
 		return ;
+	i = 0;
 	while (i < sim->dongle_count)
 	{
 		pthread_cond_destroy(&sim->dongles[i].cv);

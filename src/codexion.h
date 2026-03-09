@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 11:04:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 12:26:35 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:30:29 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,8 +84,8 @@ typedef struct s_coder
 }	t_coder;
 
 // core/monitor_checks.c
-int		coder_timed_out(t_coder *c, long now, long timeout);
-int		monitor_find_burned_out(t_sim *sim, long now);
+int		coder_timed_out(t_coder *c, long long now, long long timeout);
+int		monitor_find_burned_out(t_sim *sim, long long now);
 int		all_compiled_enough(t_sim *sim);
 
 // core/monitor.c

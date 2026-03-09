@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 11:42:39 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/07 11:59:28 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:25:21 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,7 +39,7 @@ static int	parse_numeric_rules(t_rules *rules, char **av)
 	rules->dongle_cooldown_ms = atoi(av[7]);
 	if (rules->number_of_coders < 1 || rules->time_to_burnout < 1
 		|| rules->time_to_compile < 1 || rules->time_to_debug < 1
-		|| rules->time_to_refactor < 1 || rules->number_of_compiles_required
+		|| rules->time_to_refactor < 1 || rules->number_of_compiles_required < 1
 		|| rules->dongle_cooldown_ms < 0)
 		return (1);
 	return (0);
@@ -50,7 +50,7 @@ static int	parse_scheduler_rule(t_rules *rules, char *scheduler)
 	if (strcmp(scheduler, "fifo") == 0)
 		rules->scheduler = FIFO;
 	else if (strcmp(scheduler, "edf") == 0)
-		rules->scheduler + EDF;
+		rules->scheduler = EDF;
 	else
 		return (1);
 	return (0);

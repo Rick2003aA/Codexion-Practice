@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/06 13:27:11 by shinnunohis       #+#    #+#             */
-/*   Updated: 2026/03/09 12:11:59 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:29:43 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,15 @@ long	now_ms(void) // Can't understand of this calculation logic
 
 	gettimeofday(&tv, NULL);
 	return (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
+}
+
+struct timespec	ms_to_abs_timespec(long abs_ms)
+{
+	struct timespec	ts;
+
+	ts.tv_sec = abs_ms / 1000;
+	ts.tv_nsec = (abs_ms % 1000) * 1000000L;
+	return (ts);
 }
 
 void	coder_touch(t_coder *c)

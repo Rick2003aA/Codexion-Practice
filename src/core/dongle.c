@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 11:54:02 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 12:02:21 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:28:59 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ int	dongle_lock(t_sim *sim, int idx)
 	while (!sim_should_stop(sim))
 	{
 		now = timestamp_ms(sim);
-		if (now >= d->availble_at_ms - now)
+		if (now >= d->availble_at_ms)
 			return (1);
 		wait_ms = d->availble_at_ms - now;
 		abs_deadline_ms = now_ms() + wait_ms;

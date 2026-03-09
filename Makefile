@@ -16,7 +16,7 @@ SRC := src/app/main.c \
 	src/init/sim_init.c \
 	src/common/time.c \
 	src/common/log.c \
-	src/common/utils.c \
+	src/common/sleep.c \
 	src/common/cleanup.c
 
 OBJ := $(SRC:.c=.o)
