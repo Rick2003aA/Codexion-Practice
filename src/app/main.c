@@ -22,7 +22,7 @@ static int	setup_sim(t_sim *sim, t_rules *rules, int ac, char **av)
 	return (sim_init(sim));
 }
 
-static void	init_coders(t_sim *sim, t_rules *rules)
+static int	init_coders(t_sim *sim, t_rules *rules)
 {
 	int		i;
 	t_coder	*coders;
@@ -33,28 +33,45 @@ static void	init_coders(t_sim *sim, t_rules *rules)
 	{
 		coders[i].coder_id = i + 1;
 		coders[i].sim = sim;
-		pthread_mutex_init(&coders[i].action_mutex, NULL);
+		if (pthread_mutex_init(&coders[i].action_mutex, NULL) != 0)
+		{
+			while (i > 0)
+				pthread_mutex_destroy(&coders[--i].action_mutex);
+			return (1);
+		}
 		coders[i].last_compile_start_ms = 0;
 		coders[i].waiting_compile = 0;
 		coders[i].fifo_ticket = -1;
 		coders[i].next_deadline_ms = rules->time_to_burnout;
 		i++;
 	}
+	return (0);
 }
 
-static void	run_simulation(t_sim *sim, pthread_t *monitor_th)
+static int	run_simulation(t_sim *sim, pthread_t *monitor_th,
+		int *created_workers, int *monitor_created)
 {
 	int		i;
 	t_coder	*coders;
 
+	*created_workers = 0;
+	*monitor_created = 0;
 	coders = sim->coders;
-	pthread_create(monitor_th, NULL, monitor_routine, sim);
+	if (pthread_create(monitor_th, NULL, monitor_routine, sim) != 0)
+		return (1);
+	*monitor_created = 1;
 	i = 0;
 	while (i < sim->coder_count)
 	{
-		pthread_create(&sim->threads[i], NULL, coder_routine, &coders[i]);
+		if (pthread_create(&sim->threads[i], NULL, coder_routine, &coders[i]) != 0)
+		{
+			*created_workers = i;
+			return (1);
+		}
 		i++;
 	}
+	*created_workers = i;
+	return (0);
 }
 
 static void	cleanup_sim(t_sim *sim, pthread_t monitor_th)
@@ -75,16 +92,50 @@ static void	cleanup_sim(t_sim *sim, pthread_t monitor_th)
 	free(sim->coders);
 }
 
+static void	cleanup_sim_after_failed_run(t_sim *sim, pthread_t monitor_th,
+		int created_workers, int monitor_created)
+{
+	int		i;
+	t_coder	*coders;
+
+	coders = sim->coders;
+	sim_request_stop(sim);
+	i = 0;
+	while (i < created_workers)
+		pthread_join(sim->threads[i++], NULL);
+	if (monitor_created)
+		pthread_join(monitor_th, NULL);
+	i = 0;
+	while (i < sim->coder_count)
+		pthread_mutex_destroy(&coders[i++].action_mutex);
+	sim_destroy(sim);
+	free(sim->threads);
+	free(sim->coders);
+}
+
 int	main(int ac, char **av)
 {
 	t_sim		sim;
 	t_rules		rules;
-	pthread_t	monitor_th;	
+	pthread_t	monitor_th;
+	int			created_workers;
+	int			monitor_created;
 
 	if (setup_sim(&sim, &rules, ac, av))
 		return (1);
-	init_coders(&sim, &rules);
-	run_simulation(&sim, &monitor_th);
+	if (init_coders(&sim, &rules))
+	{
+		sim_destroy(&sim);
+		free(sim.threads);
+		free(sim.coders);
+		return (1);
+	}
+	if (run_simulation(&sim, &monitor_th, &created_workers, &monitor_created))
+	{
+		cleanup_sim_after_failed_run(&sim, monitor_th,
+			created_workers, monitor_created);
+		return (1);
+	}
 	cleanup_sim(&sim, monitor_th);
 	return (0);
 }

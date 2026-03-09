@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cleanup.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 14:36:30 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 15:28:07 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 15:39:00 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ static void	destroy_dongles(t_sim *sim)
 	{
 		pthread_cond_destroy(&sim->dongles[i].cv);
 		pthread_mutex_destroy(&sim->dongles[i].m);
+		i++;
 	}
 	free(sim->dongles);
 	sim->dongles = NULL;
