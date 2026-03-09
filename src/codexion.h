@@ -66,6 +66,9 @@ typedef struct s_sim
 	pthread_cond_t	sched_cv;
 	long long		fifo_next_ticket;
 	long long		fifo_serving_ticket;
+	t_coder			**compile_heap;
+	int				heap_size;
+	int				heap_cap;
 }	t_sim;
 
 typedef struct s_coder
@@ -79,7 +82,9 @@ typedef struct s_coder
 	pthread_mutex_t	action_mutex;
 
 	long long		fifo_ticket;
+	long long		enqueue_order;
 	int				waiting_compile;
+	int				queue_index;
 	long			next_deadline_ms;
 }	t_coder;
 

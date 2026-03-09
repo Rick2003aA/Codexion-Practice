@@ -34,6 +34,10 @@ void	sim_destroy(t_sim *sim)
 	if (!sim)
 		return ;
 	destroy_dongles(sim);
+	free(sim->compile_heap);
+	sim->compile_heap = NULL;
+	sim->heap_size = 0;
+	sim->heap_cap = 0;
 	pthread_mutex_destroy(&sim->log_mutex);
 	pthread_mutex_destroy(&sim->stop_mutex);
 	pthread_cond_destroy(&sim->sched_cv);

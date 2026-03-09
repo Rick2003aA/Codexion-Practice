@@ -14,6 +14,8 @@
 
 static void	cleanup_threads_coders(t_sim *sim)
 {
+	free(sim->compile_heap);
+	sim->compile_heap = NULL;
 	free(sim->threads);
 	sim->threads = NULL;
 	free(sim->coders);
@@ -57,7 +59,10 @@ static int	init_all_dongles(t_sim *sim)
 		if (pthread_mutex_init(&sim->dongles[i].m, NULL) != 0)
 			break ;
 		if (pthread_cond_init(&sim->dongles[i].cv, NULL) != 0)
+		{
+			pthread_mutex_destroy(&sim->dongles[i].m);
 			break ;
+		}
 		sim->dongles[i].availble_at_ms = 0;
 		i++;
 	}
@@ -74,14 +79,20 @@ static int	init_all_dongles(t_sim *sim)
 
 int	sim_init(t_sim *sim)
 {
+	sim->compile_heap = NULL;
 	sim->coders = malloc(sizeof(t_coder) * sim->coder_count);
 	if (!sim->coders)
 		return (1);
 	sim->threads = malloc(sizeof(pthread_t) * sim->coder_count);
 	if (!sim->threads)
 		return (cleanup_threads_coders(sim), 1);
+	sim->compile_heap = malloc(sizeof(t_coder *) * sim->coder_count);
+	if (!sim->compile_heap)
+		return (cleanup_threads_coders(sim), 1);
 	sim->start_ms = now_ms();
 	sim->stop = 0;
+	sim->heap_size = 0;
+	sim->heap_cap = sim->coder_count;
 	sim->fifo_serving_ticket = 0;
 	sim->fifo_next_ticket = 0;
 	sim->dongles = NULL;

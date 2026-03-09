@@ -26,7 +26,6 @@ static int	monitor_check_cycle(t_sim *sim, long long now)
 	if (all_compiled_enough(sim))
 	{
 		sim_request_stop(sim);
-		printf("Mission completed");
 		return (1);
 	}
 	return (0);

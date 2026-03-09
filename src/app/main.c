@@ -43,6 +43,8 @@ static int	init_coders(t_sim *sim, t_rules *rules)
 		coders[i].last_compile_start_ms = 0;
 		coders[i].waiting_compile = 0;
 		coders[i].fifo_ticket = -1;
+		coders[i].enqueue_order = 0;
+		coders[i].queue_index = -1;
 		coders[i].next_deadline_ms = rules->time_to_burnout;
 		i++;
 	}

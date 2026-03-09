@@ -51,6 +51,20 @@ int	coder_do_compile(t_coder *coder, int first, int second)
 {
 	if (!scheduler_wait_turn(coder))
 		return (0);
+	if (first == second)
+	{
+		if (!dongle_lock(coder->sim, first))
+		{
+			scheduler_release_turn(coder);
+			return (0);
+		}
+		log_state(coder->sim, coder->coder_id, "has taken a dongle");
+		scheduler_release_turn(coder);
+		while (!sim_should_stop(coder->sim))
+			sleep_ms(1);
+		dongle_unlock_with_cooldown(coder->sim, first);
+		return (0);
+	}
 	if (!coder_take_dongles(coder, first, second))
 	{
 		scheduler_release_turn(coder);
