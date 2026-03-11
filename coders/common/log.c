@@ -14,10 +14,13 @@
 
 void	log_state(t_sim *sim, int coder_id, const char *msg)
 {
-	long	timestamp;
+	long long	timestamp;
 
 	pthread_mutex_lock(&sim->log_mutex);
-	timestamp = timestamp_ms(sim);
-	printf("%ld %d %s\n", timestamp, coder_id, msg);
+	if (!sim_should_stop(sim))
+	{
+		timestamp = timestamp_ms(sim);
+		printf("%lld %d %s\n", timestamp, coder_id, msg);
+	}
 	pthread_mutex_unlock(&sim->log_mutex);
 }

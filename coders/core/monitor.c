@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:45:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 17:31:38 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/09 19:33:34 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

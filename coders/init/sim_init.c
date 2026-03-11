@@ -83,7 +83,6 @@ int	sim_init(t_sim *sim)
 	sim->stop = 0;
 	sim->heap_size = 0;
 	sim->heap_cap = sim->coder_count;
-	sim->fifo_serving_ticket = 0;
 	sim->fifo_next_ticket = 0;
 	sim->dongles = NULL;
 	if (init_sync_objects(sim))

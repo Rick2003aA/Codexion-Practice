@@ -65,7 +65,6 @@ typedef struct s_sim
 	pthread_mutex_t	sched_mutex;
 	pthread_cond_t	sched_cv;
 	long long		fifo_next_ticket;
-	long long		fifo_serving_ticket;
 	t_coder			**compile_heap;
 	int				heap_size;
 	int				heap_cap;
@@ -81,11 +80,10 @@ typedef struct s_coder
 
 	pthread_mutex_t	action_mutex;
 
-	long long		fifo_ticket;
 	long long		enqueue_order;
 	int				waiting_compile;
 	int				queue_index;
-	long			next_deadline_ms;
+	long long		next_deadline_ms;
 }	t_coder;
 
 // core/monitor_checks.c
@@ -134,10 +132,10 @@ void	sleep_ms(long ms);
 void	log_state(t_sim *sim, int coder_id, const char *msg);
 
 // time.c
-long	now_ms(void);
-void	coder_touch(t_coder *c);
-long	timestamp_ms(t_sim *sim);
-struct timespec	ms_to_abs_timespec(long abs_ms);
+long long	now_ms(void);
+void		coder_touch(t_coder *c);
+long long	timestamp_ms(t_sim *sim);
+struct timespec	ms_to_abs_timespec(long long abs_ms);
 
 // sim_init.c
 int		sim_init(t_sim *sim);

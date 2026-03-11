@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heap.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:29:35 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 17:05:00 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/10 14:41:34 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 

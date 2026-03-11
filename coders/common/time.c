@@ -12,20 +12,20 @@
 
 #include "codexion.h"
 
-long	timestamp_ms(t_sim *sim)
+long long	timestamp_ms(t_sim *sim)
 {
 	return (now_ms() - sim->start_ms);
 }
 
-long	now_ms(void) // Can't understand of this calculation logic
+long long	now_ms(void)
 {
 	struct timeval	tv;
 
 	gettimeofday(&tv, NULL);
-	return (tv.tv_sec * 1000L + tv.tv_usec / 1000L);
+	return ((long long)tv.tv_sec * 1000LL + tv.tv_usec / 1000L);
 }
 
-struct timespec	ms_to_abs_timespec(long abs_ms)
+struct timespec	ms_to_abs_timespec(long long abs_ms)
 {
 	struct timespec	ts;
 
