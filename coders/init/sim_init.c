@@ -6,7 +6,7 @@
 /*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:53:14 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/11 16:39:20 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static int	init_single_dongle(t_dongle *d)
 		return (1);
 	if (pthread_cond_init(&d->cv, NULL) != 0)
 		return (pthread_mutex_destroy(&d->m), 1);
-	d->availble_at_us = 0;
+	d->available_at_us = 0;
 	return (0);
 }
 

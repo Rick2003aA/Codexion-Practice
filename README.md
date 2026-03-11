@@ -1,147 +1,225 @@
-# Codexion-Practice
-Codexion_practice/
-├── Makefile
-├── README.md
-└── src/
-    ├── codexion.h               # 全体共通の型定義・関数プロトタイプ
-    │
-    ├── app/
-    │   └── main.c               # エントリーポイント・シミュレーション起動制御
-    │       ├── setup_sim()
-    │       ├── init_coder_fields()
-    │       ├── init_coders()
-    │       ├── run_simulation()
-    │       └── main()
-    │
-    ├── core/                    # シミュレーションのコアロジック
-    │   ├── heap.c               # ヒープ操作（スケジューラ内部用）
-    │   │   ├── is_higher_priority()  [static]
-    │   │   ├── swap_heap_nodes()     [static]
-    │   │   ├── heapify_up()
-    │   │   └── heapify_down()
-    │   │
-    │   ├── scheduler.c          # コンパイル順番管理（FIFO / EDF）
-    │   │   ├── heap_push()           [static]
-    │   │   ├── heap_remove()         [static]
-    │   │   ├── heap_top_is()         [static]
-    │   │   ├── scheduler_wait_turn()
-    │   │   └── scheduler_release_turn()
-    │   │
-    │   ├── coder_routine.c      # コーダースレッドのメインループ
-    │   │   ├── coder_do_debug()
-    │   │   ├── coder_do_refactor()
-    │   │   ├── coder_init_cycle()    [static]
-    │   │   └── coder_routine()
-    │   │
-    │   ├── coder_actions.c      # コンパイルアクション実装
-    │   │   ├── coder_take_dongles()   [static]
-    │   │   ├── coder_finish_compile() [static]
-    │   │   ├── coder_handle_single()  [static]
-    │   │   └── coder_do_compile()
-    │   │
-    │   ├── dongle.c             # ドングル（リソース）のロック管理
-    │   │   ├── dongle_lock()
-    │   │   └── dongle_unlock_with_cooldown()
-    │   │
-    │   ├── monitor.c            # バーンアウト・終了条件の監視スレッド
-    │   │   ├── monitor_check_cycle()  [static]
-    │   │   └── monitor_routine()
-    │   │
-    │   ├── monitor_checks.c     # モニター用チェック関数群
-    │   │   ├── coder_timed_out()
-    │   │   ├── monitor_find_burned_out()
-    │   │   └── all_compiled_enough()
-    │   │
-    │   └── sim_stop.c           # シミュレーション停止フラグ管理
-    │       ├── sim_should_stop()
-    │       └── sim_request_stop()
-    │
-    ├── init/                    # 初期化処理
-    │   ├── sim_init.c           # シミュレーション構造体の初期化
-    │   │   ├── cleanup_sync_objects() [static]
-    │   │   ├── init_sync_objects()    [static]
-    │   │   ├── init_single_dongle()   [static]
-    │   │   ├── init_all_dongles()     [static]
-    │   │   └── sim_init()
-    │   │
-    │   └── parse.c              # コマンドライン引数パース
-    │       ├── ft_isdigit_str()
-    │       ├── parse_numeric_rules()  [static]
-    │       ├── parse_scheduler_rule() [static]
-    │       └── parse_args()
-    │
-    └── common/                  # 汎用ユーティリティ
-        ├── cleanup.c            # リソース解放処理
-        │   ├── destroy_dongles()              [static]
-        │   ├── sim_destroy()
-        │   ├── cleanup_threads_coders()
-        │   ├── cleanup_sim()
-        │   └── cleanup_sim_after_failed_run()
-        │
-        ├── log.c                # ログ出力
-        │   └── log_state()
-        │
-        ├── time.c               # 時刻計算・タッチ処理
-        │   ├── timestamp_us()
-        │   ├── now_us()
-        │   ├── ms_to_abs_timespec()
-        │   └── coder_touch()
-        │
-        └── sleep.c              # スリープユーティリティ
-            └── sleep_us()
+*This project has been created as part of the 42 curriculum by shinnunohis, rtsubuku.*
 
-全体の流れ
-起動フェーズ（main.c → init/）
+# Codexion
 
-main()
-  → parse_args()          引数バリデーション・ルール構造体に格納
-  → sim_init()            メモリ確保・mutex/cond初期化・ドングル初期化
-  → init_coders()         各コーダー構造体のフィールド初期化
-実行フェーズ（2種類のスレッド）
+## Description
+Codexion is a concurrency simulation inspired by the classic resource-sharing problems taught in the 42 curriculum. A set of coders sit around a table and repeatedly execute the cycle:
 
-run_simulation()
-  → pthread_create(monitor_routine)   モニタースレッド起動
-  → pthread_create(coder_routine) × N  コーダースレッド起動（N人分）
-コーダースレッド（coder_routine） — N本並行
+`compile -> debug -> refactor`
 
+Compiling is the critical section. To compile, a coder must acquire two shared USB dongles placed between adjacent seats. If a coder cannot start compiling again before `time_to_burnout` expires, that coder burns out and the simulation stops.
 
-coder_routine()  ← 各コーダーが独立して実行
-  ループ:
-    i%3==0 → coder_do_compile()     コンパイル（ドングルが必要）
-    i%3==1 → coder_do_debug()       デバッグ（待つだけ）
-    i%3==2 → coder_do_refactor()    リファクタ（待つだけ）
-coder_do_compile() の内部フロー：
+The project focuses on:
 
+- shared-resource coordination with threads
+- deadlock prevention
+- starvation-aware scheduling
+- time-based monitoring
+- deterministic logging under concurrency
 
-scheduler_wait_turn()    → ヒープ（FIFO/EDF）で自分の順番を待つ
-dongle_lock() × 2        → 左右のドングルをロック
-coder_finish_compile()   → コンパイル実行・compile_countインクリメント
-dongle_unlock() × 2      → ドングル解放（クールダウン付き）
-scheduler_release_turn() → 次の人に順番を譲る
-モニタースレッド（monitor_routine） — 1本
+The simulator also supports two compile schedulers:
 
+- `fifo`: first coder to queue for compile gets priority
+- `edf`: earliest deadline first, based on the next burnout deadline
 
-monitor_routine()
-  1msごとにループ:
-    monitor_find_burned_out()  → 最後のコンパイルから time_to_burnout 経過？
-      → Yes: log "burned out" → sim_request_stop()
-    all_compiled_enough()      → 全員が必要回数コンパイル完了？
-      → Yes: sim_request_stop()
-終了フェーズ
+## Project Overview
+The program starts one monitor thread and one worker thread per coder.
 
-sim_request_stop()
-  → stop フラグを立てる
-  → sched_cv・各ドングルの cv を broadcast（待機中スレッドを起こす）
+- Each coder thread loops through compile, debug, and refactor phases.
+- The scheduler controls which coder may enter the compile phase.
+- The dongle layer manages access to shared resources and cooldowns.
+- The monitor checks burnout and completion conditions and requests a global stop when needed.
 
-全スレッドが return → pthread_join で回収
-cleanup_sim() / cleanup_sim_after_failed_run()
-  → mutex/cond 破棄 → free
-データの依存関係（中心は t_sim）
+Main entry points:
 
-t_sim
-├── rules (t_rules)      実行パラメータ（全スレッドから読み取り）
-├── coders[] (t_coder)   各コーダーの状態（action_mutex で保護）
-├── dongles[] (t_dongle) 共有リソース（mutex+cond で保護）
-├── compile_heap[]       スケジューラ用優先度ヒープ（sched_mutex で保護）
-├── stop (int)           終了フラグ（stop_mutex で保護）
-└── log_mutex            printf の排他制御
+- `coders/app/main.c`
+- `coders/core/coder_routine.c`
+- `coders/core/coder_actions.c`
+- `coders/core/scheduler.c`
+- `coders/core/monitor.c`
+
+## Instructions
+### Build
+```bash
+make
+```
+
+### Clean
+```bash
+make clean
+make fclean
+```
+
+### Rebuild
+```bash
+make re
+```
+
+### Run
+```bash
+./codexion <number_of_coders> <time_to_burnout_ms> <time_to_compile_ms> \
+           <time_to_debug_ms> <time_to_refactor_ms> \
+           <required_compiles> <dongle_cooldown_ms> <fifo|edf>
+```
+
+Example:
+
+```bash
+./codexion 5 1400 200 100 100 3 0 fifo
+```
+
+The provided `Makefile` also includes:
+
+```bash
+make run
+```
+
+which currently runs:
+
+```bash
+./codexion 5 1400 200 100 100 3 0 fifo
+```
+
+### Output format
+Each log line is printed as:
+
+```text
+<timestamp_ms> <coder_id> <message>
+```
+
+Example:
+
+```text
+12 2 is compiling
+25 4 is debugging
+```
+
+## Blocking Cases Handled
+This implementation addresses the following concurrency hazards.
+
+### Deadlock prevention
+Each coder always locks dongles in ascending index order instead of "left then right". This removes circular wait, which is one of Coffman's deadlock conditions.
+
+Handled effect:
+
+- no cycle where every coder holds one dongle and waits forever for the other
+
+### Coffman's conditions
+The solution accepts mutual exclusion, hold-and-wait, and no preemption for dongles, but breaks circular wait through global lock ordering. That is the central deadlock prevention strategy.
+
+### Starvation reduction
+Coders do not compete for compile entry purely by timing luck. They first pass through an explicit scheduler queue implemented as a priority heap.
+
+- `fifo` reduces unfair overtaking by ordering compile requests by arrival
+- `edf` prioritizes the coder whose burnout deadline is earliest
+
+This does not mathematically eliminate starvation in every imaginable policy, but it is designed to prevent practical starvation in the simulation by making compile access explicit and policy-driven.
+
+### Dongle cooldown handling
+After release, a dongle cannot be reused immediately. Each dongle stores an availability timestamp and blocks acquisition until its cooldown expires. This models temporary unavailability without busy-spinning.
+
+### Precise burnout detection
+Internal timing is tracked in microseconds, while logs remain displayed in milliseconds. Burnout is checked against the last compile start timestamp with a dedicated monitor thread, reducing boundary errors caused by coarse millisecond-only arithmetic.
+
+### Single-dongle edge case
+If the simulation has only one coder and therefore one dongle, the compile path handles the special case explicitly instead of trying to acquire the same dongle twice.
+
+### Log serialization
+All printed output is protected by a log mutex so lines are never interleaved between threads.
+
+## Thread Synchronization Mechanisms
+This project uses standard POSIX threading primitives.
+
+### `pthread_mutex_t`
+Mutexes protect shared mutable state:
+
+- `log_mutex`: serializes all log output
+- `stop_mutex`: protects the global stop flag
+- `sched_mutex`: protects the scheduler heap, queue state, and scheduler condition variable
+- `action_mutex`: protects per-coder timing and compile counters
+- one mutex per dongle: protects dongle availability and its condition variable
+
+Race-condition prevention examples:
+
+- a coder updates `last_compile_start_us` under `action_mutex` while the monitor reads it under the same mutex
+- heap insertion/removal and priority checks are all done while holding `sched_mutex`
+- printing is always done while holding `log_mutex`, so output lines are not mixed
+
+### `pthread_cond_t`
+Condition variables are used for thread-safe waiting without constant polling.
+
+- `sched_cv`: coders waiting to compile sleep until scheduler state changes
+- each dongle has its own `cv`: coders sleep until the dongle becomes available again after cooldown
+
+Thread-safe communication examples:
+
+- when the current compiling coder releases its turn, it broadcasts on `sched_cv` so waiting coders re-check heap priority
+- when a dongle leaves cooldown, it broadcasts on the dongle condition variable so waiting coders can attempt acquisition again
+- when the simulation stops, broadcast wakes threads blocked in scheduler or dongle waits so they can exit cleanly
+
+### Monitor coordination
+The monitor thread does not directly interrupt worker threads. Instead, it requests a stop through shared state and wakeups:
+
+- set the global stop flag
+- broadcast waiting condition variables
+- let coders observe the stop flag and return safely
+
+This keeps shutdown explicit and avoids unsafe cancellation.
+
+## Technical Choices
+### Priority heap for scheduler policy
+The compile waiting queue is implemented as a binary heap over coder pointers. This makes it easy to support both FIFO and EDF with the same data structure by changing only the priority comparison rule.
+
+### Relative simulation time
+The simulator stores a `start_us` timestamp at initialization and computes all internal times as elapsed microseconds since that point. This keeps arithmetic simple and consistent across monitor checks, cooldown deadlines, and logging.
+
+### Event timestamp reuse
+For compile start, the program captures one timestamp and uses it both for internal state updates and for log output. This keeps the recorded compile start and the visible `"is compiling"` log aligned.
+
+## Development Notes
+The implementation evolved incrementally.
+
+- time measurement was first validated with `gettimeofday`
+- a single worker thread was introduced before scaling to multiple coders
+- logging was serialized early with a mutex to avoid broken output
+- dongles were first tested as one shared resource, then expanded to one per seat gap
+- the design moved from "logic inside main" to a split structure with init, core, and common modules
+- monitor logic and stop signaling were added after the basic worker loop was stable
+- burnout and required compile counts were moved into configurable runtime rules
+- dongle cooldown was added using per-dongle condition variables and timed waits
+
+## Resources
+Classic references related to threads, time, and synchronization:
+
+- POSIX threads manual pages: `pthread_create(3)`, `pthread_mutex_lock(3)`, `pthread_cond_wait(3)`, `pthread_cond_timedwait(3)`
+- `gettimeofday(2)` and `clock_gettime(2)` manual pages
+- The Open Group Base Specifications for POSIX threads
+- "The Dining Philosophers Problem" by Edsger W. Dijkstra
+- "Operating Systems: Three Easy Pieces" sections on locks, condition variables, and scheduling
+- 42 project materials on concurrency and synchronization
+
+### How AI was used
+AI was used as a design and review assistant, not as an automatic code generator.
+
+Used for:
+
+- discussing what functions were needed next
+- checking whether the intended synchronization design made sense
+- identifying mistakes and risky assumptions
+- suggesting correction strategies in words
+- clarifying concepts such as mutexes, heaps, timed waits, and scheduling policies
+
+Not used for:
+
+- generating the final code to paste directly into the project
+- replacing manual implementation and debugging work
+
+The workflow was iterative: ask for the role of a function or subsystem, implement it manually, receive verbal feedback about errors, then revise the code.
+
+## Further Reading
+If you want to explore the topic further, focus on:
+
+- deadlock conditions and lock ordering
+- starvation and fairness in schedulers
+- monitor-thread versus event-driven shutdown models
+- precision limits of time measurement in concurrent programs

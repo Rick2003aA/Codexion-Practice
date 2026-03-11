@@ -6,7 +6,7 @@
 /*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 11:04:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/11 15:47:43 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/11 16:39:20 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t	m;
 	pthread_cond_t	cv;
-	long long		availble_at_us;
+	long long		available_at_us;
 }	t_dongle;
 
 typedef struct s_rules
