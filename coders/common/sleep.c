@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   sleep.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 11:46:08 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 11:46:48 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 
-void	sleep_ms(long ms)
+void	sleep_us(long us)
 {
-	usleep(ms * 1000);
+	usleep(us);
 }

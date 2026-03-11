@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_routine.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 14:11:32 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 11:44:29 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,13 @@
 void	coder_do_debug(t_coder *coder)
 {
 	log_state(coder->sim, coder->coder_id, "is debugging");
-	sleep_ms(coder->sim->rules.time_to_debug);
+	sleep_us(coder->sim->rules.time_to_debug * 1000LL);
 }
 
 void	coder_do_refactor(t_coder *coder)
 {
 	log_state(coder->sim, coder->coder_id, "is refactoring");
-	sleep_ms(coder->sim->rules.time_to_refactor);
+	sleep_us(coder->sim->rules.time_to_refactor * 1000LL);
 }
 
 static void	coder_init_cycle(t_coder *coder, int *first, int *second)

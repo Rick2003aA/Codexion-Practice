@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   dongle.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 11:54:02 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 15:28:59 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,20 +16,20 @@ int	dongle_lock(t_sim *sim, int idx)
 {
 	t_dongle		*d;
 	long long		now;
-	long long		wait_ms;
-	long long		abs_deadline_ms;
+	long long		wait_us;
+	long long		abs_deadline_us;
 	struct timespec	ts;
 
 	d = &sim->dongles[idx];
 	pthread_mutex_lock(&d->m);
 	while (!sim_should_stop(sim))
 	{
-		now = timestamp_ms(sim);
-		if (now >= d->availble_at_ms)
+		now = timestamp_us(sim);
+		if (now >= d->availble_at_us)
 			return (1);
-		wait_ms = d->availble_at_ms - now;
-		abs_deadline_ms = now_ms() + wait_ms;
-		ts = ms_to_abs_timespec(abs_deadline_ms);
+		wait_us = d->availble_at_us - now;
+		abs_deadline_us = now_us() + wait_us;
+		ts = us_to_abs_timespec(abs_deadline_us);
 		pthread_cond_timedwait(&d->cv, &d->m, &ts);
 	}
 	pthread_mutex_unlock(&d->m);
@@ -42,8 +42,8 @@ void	dongle_unlock_with_cooldown(t_sim *sim, int idx)
 	long long	now;
 
 	d = &sim->dongles[idx];
-	now = timestamp_ms(sim);
-	d->availble_at_ms = now + sim->rules.dongle_cooldown_ms;
+	now = timestamp_us(sim);
+	d->availble_at_us = now + sim->rules.dongle_cooldown_ms * 1000LL;
 	pthread_cond_broadcast(&d->cv);
 	pthread_mutex_unlock(&d->m);
 }

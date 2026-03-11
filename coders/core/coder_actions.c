@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   coder_actions.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/06 13:27:11 by shinnunohis       #+#    #+#             */
-/*   Updated: 2026/03/09 12:27:20 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:15 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,14 +32,17 @@ static int	coder_take_dongles(t_coder *coder, int first, int second)
 static void	coder_finish_compile(t_coder *coder, int first, int second)
 {
 	t_sim	*sim;
+	long long	compile_start_us;
 
 	sim = coder->sim;
-	coder_touch(coder);
+	compile_start_us = timestamp_us(sim);
+	coder_touch_at(coder, compile_start_us);
 	pthread_mutex_lock(&sim->sched_mutex);
-	coder->next_deadline_ms = timestamp_ms(sim) + sim->rules.time_to_burnout;
+	coder->next_deadline_us = compile_start_us
+		+ sim->rules.time_to_burnout * 1000LL;
 	pthread_mutex_unlock(&sim->sched_mutex);
-	log_state(sim, coder->coder_id, "is compiling");
-	sleep_ms(sim->rules.time_to_compile);
+	log_state_at(sim, coder->coder_id, compile_start_us, "is compiling");
+	sleep_us(sim->rules.time_to_compile * 1000LL);
 	dongle_unlock_with_cooldown(sim, second);
 	dongle_unlock_with_cooldown(sim, first);
 	pthread_mutex_lock(&coder->action_mutex);
@@ -57,7 +60,7 @@ static int	coder_handle_single(t_coder *coder, int first)
 	log_state(coder->sim, coder->coder_id, "has taken a dongle");
 	scheduler_release_turn(coder);
 	while (!sim_should_stop(coder->sim))
-		sleep_ms(1);
+		sleep_us(1000);
 	dongle_unlock_with_cooldown(coder->sim, first);
 	return (0);
 }

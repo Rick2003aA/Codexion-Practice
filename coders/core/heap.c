@@ -6,7 +6,7 @@
 /*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/09 12:29:35 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/10 14:41:34 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,8 @@ static int	is_higher_priority(t_sim *sim, t_coder *a, t_coder *b)
 	}
 	else
 	{
-		if (a->next_deadline_ms != b->next_deadline_ms)
-			return (a->next_deadline_ms < b->next_deadline_ms);
+		if (a->next_deadline_us != b->next_deadline_us)
+			return (a->next_deadline_us < b->next_deadline_us);
 	}
 	return (a->coder_id < b->coder_id);
 }

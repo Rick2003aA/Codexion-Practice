@@ -82,13 +82,13 @@ Codexion_practice/
         │   └── log_state()
         │
         ├── time.c               # 時刻計算・タッチ処理
-        │   ├── timestamp_ms()
-        │   ├── now_ms()
+        │   ├── timestamp_us()
+        │   ├── now_us()
         │   ├── ms_to_abs_timespec()
         │   └── coder_touch()
         │
         └── sleep.c              # スリープユーティリティ
-            └── sleep_ms()
+            └── sleep_us()
 
 全体の流れ
 起動フェーズ（main.c → init/）

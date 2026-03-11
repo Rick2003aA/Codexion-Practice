@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 11:03:37 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 15:00:44 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ static void	init_coder_fields(t_coder *coders, t_rules *rules, int i, t_sim *sim
 {
 	coders[i].coder_id = i + 1;
 	coders[i].sim = sim;
-	coders[i].last_compile_start_ms = 0;
+	coders[i].last_compile_start_us = 0;
 	coders[i].waiting_compile = 0;
 	coders[i].enqueue_order = 0;
 	coders[i].queue_index = -1;
-	coders[i].next_deadline_ms = rules->time_to_burnout;
+	coders[i].next_deadline_us = rules->time_to_burnout * 1000LL;
 }
 
 static int	init_coders(t_sim *sim, t_rules *rules)

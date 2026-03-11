@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   sim_init.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:53:14 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 15:26:40 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ static int	init_single_dongle(t_dongle *d)
 		return (1);
 	if (pthread_cond_init(&d->cv, NULL) != 0)
 		return (pthread_mutex_destroy(&d->m), 1);
-	d->availble_at_ms = 0;
+	d->availble_at_us = 0;
 	return (0);
 }
 
@@ -79,7 +79,7 @@ int	sim_init(t_sim *sim)
 	sim->compile_heap = malloc(sizeof(t_coder *) * sim->coder_count);
 	if (!sim->compile_heap)
 		return (cleanup_threads_coders(sim), 1);
-	sim->start_ms = now_ms();
+	sim->start_us = now_us();
 	sim->stop = 0;
 	sim->heap_size = 0;
 	sim->heap_cap = sim->coder_count;

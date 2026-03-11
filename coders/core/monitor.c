@@ -6,7 +6,7 @@
 /*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:45:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 19:33:34 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,10 +39,10 @@ void	*monitor_routine(void *arg)
 	sim = (t_sim *)arg;
 	while (!sim_should_stop(sim))
 	{
-		now = timestamp_ms(sim);
+		now = timestamp_us(sim);
 		if (monitor_check_cycle(sim, now))
 			return (NULL);
-		sleep_ms(1);
+		sleep_us(1000);
 	}
 	return (NULL);
 }

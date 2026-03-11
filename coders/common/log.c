@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   log.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/06 13:27:11 by shinnunohis       #+#    #+#             */
-/*   Updated: 2026/03/09 11:47:22 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,19 @@
 
 void	log_state(t_sim *sim, int coder_id, const char *msg)
 {
-	long long	timestamp;
+	log_state_at(sim, coder_id, timestamp_us(sim), msg);
+}
+
+void	log_state_at(t_sim *sim, int coder_id, long long timestamp_us,
+		const char *msg)
+{
+	long long	timestamp_ms;
 
 	pthread_mutex_lock(&sim->log_mutex);
 	if (!sim_should_stop(sim))
 	{
-		timestamp = timestamp_ms(sim);
-		printf("%lld %d %s\n", timestamp, coder_id, msg);
+		timestamp_ms = timestamp_us / 1000LL;
+		printf("%lld %d %s\n", timestamp_ms, coder_id, msg);
 	}
 	pthread_mutex_unlock(&sim->log_mutex);
 }

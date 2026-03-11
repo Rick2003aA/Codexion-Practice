@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   monitor_checks.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 13:48:07 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/07 14:08:25 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:48:32 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,9 @@ int	coder_timed_out(t_coder *c, long long now, long long timeout)
 	long long	last;
 
 	pthread_mutex_lock(&c->action_mutex);
-	last = c->last_compile_start_ms;
+	last = c->last_compile_start_us;
 	pthread_mutex_unlock(&c->action_mutex);
-	return (now - last > timeout);
+	return (now - last > timeout * 1000LL);
 }
 
 int	monitor_find_burned_out(t_sim *sim, long long now)

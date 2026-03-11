@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   codexion.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
+/*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 11:04:57 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/09 15:30:29 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/11 15:47:43 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct s_dongle
 {
 	pthread_mutex_t	m;
 	pthread_cond_t	cv;
-	long long		availble_at_ms;
+	long long		availble_at_us;
 }	t_dongle;
 
 typedef struct s_rules
@@ -55,7 +55,7 @@ typedef struct s_sim
 	int				dongle_count;
 	t_coder			*coders;
 	pthread_t		*threads;
-	long long		start_ms;
+	long long		start_us;
 	pthread_mutex_t	log_mutex;
 	t_dongle		*dongles;
 
@@ -75,7 +75,7 @@ typedef struct s_coder
 	int				coder_id;
 	t_sim			*sim;
 
-	long long		last_compile_start_ms;
+	long long		last_compile_start_us;
 	int				compile_count;
 
 	pthread_mutex_t	action_mutex;
@@ -83,7 +83,7 @@ typedef struct s_coder
 	long long		enqueue_order;
 	int				waiting_compile;
 	int				queue_index;
-	long long		next_deadline_ms;
+	long long		next_deadline_us;
 }	t_coder;
 
 // core/monitor_checks.c
@@ -126,16 +126,18 @@ void	cleanup_sim_after_failed_run(t_sim *sim, pthread_t monitor_th,
 		int created_workers, int monitor_created);
 
 // utils.c
-void	sleep_ms(long ms);
+void	sleep_us(long us);
 
 // log.c
 void	log_state(t_sim *sim, int coder_id, const char *msg);
+void	log_state_at(t_sim *sim, int coder_id, long long timestamp_us,
+			const char *msg);
 
 // time.c
-long long	now_ms(void);
-void		coder_touch(t_coder *c);
-long long	timestamp_ms(t_sim *sim);
-struct timespec	ms_to_abs_timespec(long long abs_ms);
+long long	now_us(void);
+void		coder_touch_at(t_coder *c, long long timestamp_us);
+long long	timestamp_us(t_sim *sim);
+struct timespec	us_to_abs_timespec(long long abs_us);
 
 // sim_init.c
 int		sim_init(t_sim *sim);
