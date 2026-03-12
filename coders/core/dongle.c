@@ -48,31 +48,42 @@ static void	remove_waiter(t_dongle *d, t_coder *coder)
 	}
 }
 
-int	dongle_lock(t_sim *sim, int idx, t_coder *coder)
+static struct timespec	next_wakeup(t_dongle *d, long long now)
 {
-	t_dongle		*d;
+	if (now < d->available_at_us)
+		return (us_to_abs_timespec(now_us() + d->available_at_us - now));
+	return (us_to_abs_timespec(now_us() + 1000));
+}
+
+static int	try_acquire(t_sim *sim, t_dongle *d, t_coder *coder)
+{
 	long long		now;
 	struct timespec	ts;
+
+	now = timestamp_us(sim);
+	if (!d->locked && now >= d->available_at_us
+		&& is_my_turn(sim, d, coder))
+	{
+		d->locked = 1;
+		remove_waiter(d, coder);
+		return (1);
+	}
+	ts = next_wakeup(d, now);
+	pthread_cond_timedwait(&d->cv, &d->m, &ts);
+	return (0);
+}
+
+int	dongle_lock(t_sim *sim, int idx, t_coder *coder)
+{
+	t_dongle	*d;
 
 	d = &sim->dongles[idx];
 	pthread_mutex_lock(&d->m);
 	d->waiters[d->waiter_count++] = coder;
 	while (!sim_should_stop(sim))
 	{
-		now = timestamp_us(sim);
-		if (!d->locked && now >= d->available_at_us
-			&& is_my_turn(sim, d, coder))
-		{
-			d->locked = 1;
-			remove_waiter(d, coder);
-			pthread_mutex_unlock(&d->m);
-			return (1);
-		}
-		if (now < d->available_at_us)
-			ts = us_to_abs_timespec(now_us() + d->available_at_us - now);
-		else
-			ts = us_to_abs_timespec(now_us() + 1000);
-		pthread_cond_timedwait(&d->cv, &d->m, &ts);
+		if (try_acquire(sim, d, coder))
+			return (pthread_mutex_unlock(&d->m), 1);
 	}
 	remove_waiter(d, coder);
 	pthread_mutex_unlock(&d->m);
