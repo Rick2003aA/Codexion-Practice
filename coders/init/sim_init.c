@@ -6,7 +6,7 @@
 /*   By: shinnunohisashiryuuichi <shinnunohisash    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:53:14 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/11 16:39:20 by shinnunohis      ###   ########.fr       */
+/*   Updated: 2026/03/12 00:00:00 by shinnunohis      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,23 +16,14 @@ static void	cleanup_sync_objects(t_sim *sim)
 {
 	pthread_mutex_destroy(&sim->log_mutex);
 	pthread_mutex_destroy(&sim->stop_mutex);
-	pthread_cond_destroy(&sim->sched_cv);
-	pthread_mutex_destroy(&sim->sched_mutex);
 }
 
 static int	init_sync_objects(t_sim *sim)
 {
-	if (pthread_mutex_init(&sim->sched_mutex, NULL) != 0)
-		return (1);
-	if (pthread_cond_init(&sim->sched_cv, NULL) != 0)
-		return (pthread_mutex_destroy(&sim->sched_mutex), 1);
 	if (pthread_mutex_init(&sim->stop_mutex, NULL) != 0)
-		return (pthread_cond_destroy(&sim->sched_cv),
-			pthread_mutex_destroy(&sim->sched_mutex), 1);
+		return (1);
 	if (pthread_mutex_init(&sim->log_mutex, NULL) != 0)
-		return (pthread_mutex_destroy(&sim->stop_mutex),
-			pthread_cond_destroy(&sim->sched_cv),
-			pthread_mutex_destroy(&sim->sched_mutex), 1);
+		return (pthread_mutex_destroy(&sim->stop_mutex), 1);
 	return (0);
 }
 
@@ -43,6 +34,10 @@ static int	init_single_dongle(t_dongle *d)
 	if (pthread_cond_init(&d->cv, NULL) != 0)
 		return (pthread_mutex_destroy(&d->m), 1);
 	d->available_at_us = 0;
+	d->locked = 0;
+	d->waiter_count = 0;
+	d->waiters[0] = NULL;
+	d->waiters[1] = NULL;
 	return (0);
 }
 
@@ -69,22 +64,14 @@ static int	init_all_dongles(t_sim *sim)
 
 int	sim_init(t_sim *sim)
 {
-	sim->compile_heap = NULL;
 	sim->coders = malloc(sizeof(t_coder) * sim->coder_count);
 	if (!sim->coders)
 		return (1);
 	sim->threads = malloc(sizeof(pthread_t) * sim->coder_count);
 	if (!sim->threads)
 		return (cleanup_threads_coders(sim), 1);
-	sim->compile_heap = malloc(sizeof(t_coder *) * sim->coder_count);
-	if (!sim->compile_heap)
-		return (cleanup_threads_coders(sim), 1);
 	sim->start_us = now_us();
 	sim->stop = 0;
-	sim->sched_active = 0;
-	sim->heap_size = 0;
-	sim->heap_cap = sim->coder_count;
-	sim->fifo_next_ticket = 0;
 	sim->dongles = NULL;
 	if (init_sync_objects(sim))
 		return (cleanup_threads_coders(sim), 1);

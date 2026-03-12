@@ -7,8 +7,6 @@ CFLAGS += -I coders
 SRC := coders/app/main.c \
 	coders/core/sim_stop.c \
 	coders/core/dongle.c \
-	coders/core/heap.c \
-	coders/core/scheduler.c \
 	coders/core/coder_actions.c \
 	coders/core/coder_routine.c \
 	coders/core/monitor.c \

@@ -33,6 +33,9 @@ typedef struct s_dongle
 	pthread_mutex_t	m;
 	pthread_cond_t	cv;
 	long long		available_at_us;
+	int				locked;
+	t_coder			*waiters[2];
+	int				waiter_count;
 }	t_dongle;
 
 typedef struct s_rules
@@ -61,14 +64,6 @@ typedef struct s_sim
 
 	int				stop;
 	pthread_mutex_t	stop_mutex;
-
-	int				sched_active;
-	pthread_mutex_t	sched_mutex;
-	pthread_cond_t	sched_cv;
-	long long		fifo_next_ticket;
-	t_coder			**compile_heap;
-	int				heap_size;
-	int				heap_cap;
 }	t_sim;
 
 typedef struct s_coder
@@ -81,9 +76,6 @@ typedef struct s_coder
 
 	pthread_mutex_t	action_mutex;
 
-	long long		enqueue_order;
-	int				waiting_compile;
-	int				queue_index;
 	long long		next_deadline_us;
 }	t_coder;
 
@@ -100,16 +92,8 @@ int		sim_should_stop(t_sim *sim);
 void	sim_request_stop(t_sim *sim);
 
 // core/dongle.c
-int		dongle_lock(t_sim *sim, int idx);
+int		dongle_lock(t_sim *sim, int idx, t_coder *coder);
 void	dongle_unlock_with_cooldown(t_sim *sim, int idx);
-
-// core/heap.c
-void	heapify_up(t_sim *sim, int idx);
-void	heapify_down(t_sim *sim, int idx);
-
-// core/scheduler.c
-int		scheduler_wait_turn(t_coder *coder);
-void	scheduler_release_turn(t_coder *coder);
 
 // core/coder_actions.c
 int		coder_do_compile(t_coder *coder, int first, int second);

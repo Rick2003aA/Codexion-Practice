@@ -27,10 +27,7 @@ static void	init_coder_fields(t_coder *coders, t_rules *rules, int i, t_sim *sim
 	coders[i].coder_id = i + 1;
 	coders[i].sim = sim;
 	coders[i].last_compile_start_us = 0;
-	coders[i].waiting_compile = 0;
-	coders[i].enqueue_order = 0;
 	coders[i].compile_count = 0;
-	coders[i].queue_index = -1;
 	coders[i].next_deadline_us = rules->time_to_burnout * 1000LL;
 }
 

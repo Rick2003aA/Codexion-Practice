@@ -6,7 +6,7 @@
 /*   By: rtsubuku <rtsubuku@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/03/07 12:48:46 by rtsubuku          #+#    #+#             */
-/*   Updated: 2026/03/07 13:44:30 by rtsubuku         ###   ########.fr       */
+/*   Updated: 2026/03/12 00:00:00 by rtsubuku         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ void	sim_request_stop(t_sim *sim)
 	pthread_mutex_lock(&sim->stop_mutex);
 	sim->stop = 1;
 	pthread_mutex_unlock(&sim->stop_mutex);
-	pthread_cond_broadcast(&sim->sched_cv);
 	i = 0;
 	while (i < sim->dongle_count)
 	{
