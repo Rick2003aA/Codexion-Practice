@@ -42,7 +42,7 @@ static void	coder_finish_compile(t_coder *coder, int first, int second)
 		+ sim->rules.time_to_burnout * 1000LL;
 	pthread_mutex_unlock(&sim->sched_mutex);
 	log_state_at(sim, coder->coder_id, compile_start_us, "is compiling");
-	sleep_us(sim->rules.time_to_compile * 1000LL);
+	sleep_us_interruptible(sim, sim->rules.time_to_compile * 1000LL);
 	dongle_unlock_with_cooldown(sim, second);
 	dongle_unlock_with_cooldown(sim, first);
 	pthread_mutex_lock(&coder->action_mutex);

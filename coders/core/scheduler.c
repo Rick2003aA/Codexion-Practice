@@ -63,7 +63,8 @@ int	scheduler_wait_turn(t_coder *coder)
 		coder->waiting_compile = 1;
 		heap_push(sim, coder);
 	}
-	while (!sim_should_stop(sim) && !heap_top_is(sim, coder))
+	while (!sim_should_stop(sim)
+		&& (sim->sched_active || !heap_top_is(sim, coder)))
 		pthread_cond_wait(&sim->sched_cv, &sim->sched_mutex);
 	if (sim_should_stop(sim))
 	{
@@ -72,6 +73,7 @@ int	scheduler_wait_turn(t_coder *coder)
 		pthread_mutex_unlock(&sim->sched_mutex);
 		return (0);
 	}
+	sim->sched_active = 1;
 	pthread_mutex_unlock(&sim->sched_mutex);
 	return (1);
 }
@@ -84,6 +86,7 @@ void	scheduler_release_turn(t_coder *coder)
 	pthread_mutex_lock(&sim->sched_mutex);
 	heap_remove(sim, coder);
 	coder->waiting_compile = 0;
+	sim->sched_active = 0;
 	pthread_cond_broadcast(&sim->sched_cv);
 	pthread_mutex_unlock(&sim->sched_mutex);
 }

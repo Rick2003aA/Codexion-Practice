@@ -15,13 +15,13 @@
 void	coder_do_debug(t_coder *coder)
 {
 	log_state(coder->sim, coder->coder_id, "is debugging");
-	sleep_us(coder->sim->rules.time_to_debug * 1000LL);
+	sleep_us_interruptible(coder->sim, coder->sim->rules.time_to_debug * 1000LL);
 }
 
 void	coder_do_refactor(t_coder *coder)
 {
 	log_state(coder->sim, coder->coder_id, "is refactoring");
-	sleep_us(coder->sim->rules.time_to_refactor * 1000LL);
+	sleep_us_interruptible(coder->sim, coder->sim->rules.time_to_refactor * 1000LL);
 }
 
 static void	coder_init_cycle(t_coder *coder, int *first, int *second)

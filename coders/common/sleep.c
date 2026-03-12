@@ -12,7 +12,16 @@
 
 #include "codexion.h"
 
-void	sleep_us(long us)
+void	sleep_us(long long us)
 {
 	usleep(us);
+}
+
+void	sleep_us_interruptible(t_sim *sim, long long us)
+{
+	long long	end;
+
+	end = now_us() + us;
+	while (!sim_should_stop(sim) && now_us() < end)
+		usleep(500);
 }

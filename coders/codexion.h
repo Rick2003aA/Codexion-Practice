@@ -38,12 +38,12 @@ typedef struct s_dongle
 typedef struct s_rules
 {
 	int			number_of_coders;
-	long long	time_to_burnout;
-	long long	time_to_compile;
-	long long	time_to_debug;
-	long long	time_to_refactor;
+	int			time_to_burnout;
+	int			time_to_compile;
+	int			time_to_debug;
+	int			time_to_refactor;
 	int			number_of_compiles_required;
-	long long	dongle_cooldown_ms;
+	int			dongle_cooldown_ms;
 	t_scheduler	scheduler;
 }	t_rules;
 
@@ -62,6 +62,7 @@ typedef struct s_sim
 	int				stop;
 	pthread_mutex_t	stop_mutex;
 
+	int				sched_active;
 	pthread_mutex_t	sched_mutex;
 	pthread_cond_t	sched_cv;
 	long long		fifo_next_ticket;
@@ -87,7 +88,7 @@ typedef struct s_coder
 }	t_coder;
 
 // core/monitor_checks.c
-int		coder_timed_out(t_coder *c, long long now, long long timeout);
+int		coder_timed_out(t_coder *c, long long now, int timeout);
 int		monitor_find_burned_out(t_sim *sim, long long now);
 int		all_compiled_enough(t_sim *sim);
 
@@ -125,8 +126,9 @@ void	cleanup_sim(t_sim *sim, pthread_t monitor_th);
 void	cleanup_sim_after_failed_run(t_sim *sim, pthread_t monitor_th,
 		int created_workers, int monitor_created);
 
-// utils.c
-void	sleep_us(long us);
+// common/sleep.c
+void	sleep_us(long long us);
+void	sleep_us_interruptible(t_sim *sim, long long us);
 
 // log.c
 void	log_state(t_sim *sim, int coder_id, const char *msg);

@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <limits.h>
 
 int	ft_isdigit_str(char *str)
 {
@@ -28,19 +29,43 @@ int	ft_isdigit_str(char *str)
 	return (1);
 }
 
+static int	ft_safe_atoi(const char *str, int *out)
+{
+	long	val;
+
+	val = 0;
+	while (*str)
+	{
+		val = val * 10 + (*str - '0');
+		if (val > INT_MAX)
+			return (1);
+		str++;
+	}
+	*out = (int)val;
+	return (0);
+}
+
 static int	parse_numeric_rules(t_rules *rules, char **av)
 {
-	rules->number_of_coders = atoi(av[1]);
-	rules->time_to_burnout = atoi(av[2]);
-	rules->time_to_compile = atoi(av[3]);
-	rules->time_to_debug = atoi(av[4]);
-	rules->time_to_refactor = atoi(av[5]);
-	rules->number_of_compiles_required = atoi(av[6]);
-	rules->dongle_cooldown_ms = atoi(av[7]);
-	if (rules->number_of_coders < 1 || rules->time_to_burnout < 1
-		|| rules->time_to_compile < 1 || rules->time_to_debug < 1
-		|| rules->time_to_refactor < 1 || rules->number_of_compiles_required < 1
-		|| rules->dongle_cooldown_ms < 0)
+	int		vals[7];
+	int		i;
+
+	i = 0;
+	while (i < 7)
+	{
+		if (ft_safe_atoi(av[i + 1], &vals[i]))
+			return (1);
+		i++;
+	}
+	rules->number_of_coders = vals[0];
+	rules->time_to_burnout = vals[1];
+	rules->time_to_compile = vals[2];
+	rules->time_to_debug = vals[3];
+	rules->time_to_refactor = vals[4];
+	rules->number_of_compiles_required = vals[5];
+	rules->dongle_cooldown_ms = vals[6];
+	if (vals[0] < 1 || vals[1] < 1 || vals[2] < 1 || vals[3] < 1
+		|| vals[4] < 1 || vals[5] < 1 || vals[6] < 0)
 		return (1);
 	return (0);
 }

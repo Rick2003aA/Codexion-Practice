@@ -14,7 +14,7 @@
 // 0: continue
 // 1: stop
 
-int	coder_timed_out(t_coder *c, long long now, long long timeout)
+int	coder_timed_out(t_coder *c, long long now, int timeout)
 {
 	long long	last;
 

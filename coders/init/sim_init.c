@@ -81,6 +81,7 @@ int	sim_init(t_sim *sim)
 		return (cleanup_threads_coders(sim), 1);
 	sim->start_us = now_us();
 	sim->stop = 0;
+	sim->sched_active = 0;
 	sim->heap_size = 0;
 	sim->heap_cap = sim->coder_count;
 	sim->fifo_next_ticket = 0;
